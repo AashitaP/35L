@@ -1,0 +1,50 @@
+1. first i followed the steps on piazza to set up the beaglebone
+2. next to create a userid for my team member I followed the following steps: 
+
+Generate public and private keys
+$ ssh-keygen (by default saved to ~/.ssh/is_rsa and id_rsa.pub) 
+
+This prompted to enter a passphrase that I left as empty.
+
+Create an account for the client on the server
+$ sudo useradd –d /home/aashitapatwari –m parth
+
+$ sudo passwd parth
+
+Create .ssh directory for new user
+$ cd /home/aashitapatwari
+$ sudo mkdir .ssh
+
+Change ownership and permission on .ssh directory
+$ sudo chown –R parth .ssh
+$ sudo chmod 700 .ssh
+
+3. To log in to my team member's server I used the following steps: 
+
+Generate public and private keys
+$ ssh-keygen
+
+Copy your public key to the server for key-based authentication (~/.ssh/authorized_keys)
+$ ssh-copy-id –i apatwari@131.179.21.225
+
+and was prompted to enter the password.
+
+SSH to server
+$ ssh apatwari@131.179.21.225
+
+and I managed to login, evident from 
+
+pringlesEdison:~$
+
+
+4. For X11 session forwarding, I used the following command
+
+ $ ssh –X apatwari@131.179.21.225
+
+The instructions from my lab stated that I have to run the following commands on the remote host
+$ xterm, $ gedit, $ firefox, etc.
+
+However, my partner is using an edison instead of a beaglebone and I am unable to run the commands for some reason. 
+
+
+

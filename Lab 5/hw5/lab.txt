@@ -1,0 +1,83 @@
+1. I created the two program files tr2b.c and tr2u.c 
+- one using a buffered and other an unbuffered I/O respectively.  
+Following the spec, each implementation takes two operands from and to, 
+transliterates every byte in from to the corresponding byte in to 
+while doing error checking to make sure that they are the same length 
+and from does not have duplicate bytes. 
+tr2b uses getchar and putchar  
+while tr2u uses read and write system calls. 
+
+2. To test this out I first compiled using 
+
+$ gcc -std=c11 tr2b.c -o tr2b
+
+followed by
+
+$ echo 'ab\nde-f' | ./tr2b "a\n-" "z@m+" 
+zb@mde+f
+
+for both files. 
+
+3. To create a file with at least 5,000,000 bytes I used the command
+
+$ head --bytes=5000000  /dev/urandom > largefile.txt
+
+4. Next I use the strace command to compare the system calls 
+issued by my tr2b and tr2u commands 
+(a) when copying one file to another, and 
+(b) when copying a file to your terminal
+
+For a) I used
+
+$ strace -o strace_output1 ./tr2b 'ABC' 'abc' <largefile.txt >copy_b.txt
+$ strace -o strace_output2 ./tr2u 'ABC' 'abc' <largefile.txt >copy_u.txt
+
+I then use wc -l on each output file to count the number of calls. 
+
+strace_output2 has 9942749 lines while strace_output1 has 1252 lines.
+
+For b) I used
+
+$ strace -o strace_output3 ./tr2b 'ABC' 'abc' <largefile.txt 
+$ strace -o strace_output4 ./tr2u 'ABC' 'abc' <largefile.txt 
+
+strace_output3 has 20450 lines while strace_output4 has 9281782 lines. 
+
+In both cases, the buffered I/O makes fewer system calls. 
+This is because the unbuffered version reads and writes 
+one at a time so it requires more system calls.
+
+Furthermore, printing to the terminal requires more system calls for the buffered I/O. 
+
+4. Next we have to use the time command to measure how much faster one program is. 
+I use the commands 
+
+time ./tr2b abc ABC < largefile.txt > timeb.txt
+
+real	0m0.578s
+user	0m0.408s
+sys	0m0.081s
+
+
+time ./tr2b abc ABC < largefile.txt
+
+real	0m1.237s
+user	0m0.322s
+sys	0m0.093s
+
+time ./tr2u abc ABC < largefile.txt
+
+real	0m8.019s
+user	0m1.438s
+sys	0m6.564s
+
+time ./tr2u abc ABC < largefile.txt > timeu.txt
+
+real	0m8.890s
+user	0m1.357s
+sys	0m7.459s
+
+Hence using tr2b and a buffered I/O is faster when 
+copying the same data for both cases.
+
+

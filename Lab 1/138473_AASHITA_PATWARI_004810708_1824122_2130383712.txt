@@ -1,0 +1,166 @@
+1. man -k (keyword)
+I typed man man to see the manual for "man" and get the answer. 
+for example man -k printf
+prints out all the commands with printf in their man page. 
+
+2. which cp (/usr/local/cs/bin/cp) and 
+which wc (/usr/local/cs/bin/wc)
+I tried the commands with whereis as well, 
+but that gave extra information that was not necessary. 
+
+3. From the previous question,
+ I inferred it might be located in usr/bin directory 
+ and did cd /usr/bin and ls to confirm. 
+I used man find to look through the directory to figure out the find command,
+which is find . -name '?' -executable. 
+
+The programs are:
+
+./w
+
+I used man w. 
+This program shows who is logged on and what they are doing. 
+
+./X
+
+Doing ls -l shows th
+at X is a symbolic link to Xorg. 
+So I used man Xorg. 
+This program is the X11R7 X server that was originally designed for UNIX 
+and UNIX-like operating systems running on Intel x86 hardware.
+
+./[
+
+man [ showed that it was a bash builtin command. 
+
+4. Reading off the results of the previous ls -l command, 
+we see that emacs is a symbolic link to /etc/alternatives/emacs. 
+Going into that using cd /etc/alternatives and doing ls -l again, 
+emacs is a symbolic link to /usr/bin/emacs-24.3. 
+/usr/bin/emacs-24.3 is not linked to anything else. 
+Hence, emacs-24.3 is actually executed.
+
+5. g+s: sets group ID on execution,
+which means that it grants permission of the group that own’s the file, 
+o-x: changes permission so that users who are not the owner of the file 
+or members of the group can't execute
+
+6. Looking through the manual of find, the command is find -mtime -21 -type f. 
+The minus sign before 21 is so that it displays files within the last 3 weeks. 
+Type f is for file type. 
+
+7. find -mtime -21 -type d
+Type d is for directory type. 
+
+8. which find to get which directory it is in, 
+ouputs /usr/bin/find. 
+man find to find the commands. 
+find /usr/bin -type l > links.txt 
+to put all the files that are symbolic links into links.txt. 
+wc -l links.txt 
+to count the number of files/lines. 
+The answer is 246. 
+
+9. I used cd /usr/lib to get into the directory. 
+man ls to read through the manual. 
+ls -lt would list, sorted by modification time, newest first. 
+the first file on the bottom that is not a directory 
+(no d in the front) 
+is the oldest regular file. 
+
+The answer is libgpg-error.so.0.10.0. 
+
+10. man locale to read the manual. 
+locale gets its data from environment variable,
+which is localedef (man -k locale). 
+man localedef. 
+The program reads the indicated charmap and input files, 
+and compiles them to a binary form quickly usable by the locale function. 
+So data comes from charmap and input files.  
+
+11. C-h ? to see what command to use. 
+Typing a sort shows commands with sort in their name. 
+C-x o to switch buffers. 
+The commands are: 
+
+Buffer-menu-sort              M-x ... RET
+sort-columns                  M-x ... RET
+sort-fields                   M-x ... RET
+sort-lines                   
+sort-numeric-fields           M-x ... RET
+sort-pages                    M-x ... RET
+sort-paragraphs               M-x ... RET
+sort-regexp-fields            M-x ... RET
+tabulated-list-col-sort       M-x ... RET
+tabulated-list-sort           M-x ... RET
+
+12. C-h r to browse through the emacs manual. 
+C-h k KEY lists descriptions of each keystroke. 
+C-h K KEY also display descriptions. 
+I chose to go with the latter for all the keys except C-M-c.  
+
+
+‘C-M-a’
+Move to beginning of current or preceding defun (‘beginning-of-defun’).
+
+‘C-M-b’
+Move backward over a balanced expression (‘backward-sexp’).
+
+'C-M-c'
+C-M-c runs the command exit-recursive-edit (found in global-map),
+which is an interactive built-in function in ‘C source code’.
+
+'C-M-d' 
+To move _down_ in the parenthesis structure (‘down-list’).
+
+‘C-M-e’
+Move to end of current or following defun (‘end-of-defun’).
+
+‘C-M-f’
+ Move forward over a balanced expression (‘forward-sexp’).
+
+'C-M-g' does not exist
+
+‘C-M-h’
+ Put region around whole current or following defun (‘mark-defun’).
+
+
+13. C-h K C-g to display description. C-x o to switch buffers. 
+
+"Quitting with ‘C-g’ is the way to get rid of a partially typed
+command, or a numeric argument that you don’t want.  Furthermore, if you
+are in the middle of a command that is running, ‘C-g’ stops the command
+in a relatively safe way.  For example, if you quit out of a kill
+command that is taking a long time, either your text will _all_ still be
+in the buffer, or it will _all_ be in the kill ring, or maybe both.  If
+the region is active, ‘C-g’ deactivates the mark, unless Transient Mark
+mode is off (see Disabled Transient Mark).  If you are in the middle
+of an incremental search, ‘C-g’ behaves specially; it may take two
+successive ‘C-g’ characters to get out of a search.""
+
+14. C-h r to browse through manual. 
+C-h f yank to search by function name. 
+
+Reinsert ("paste") the last stretch of killed text.
+More precisely, reinsert the most recent kill, which is the
+stretch of killed text most recently killed OR yanked.  
+
+15. invoke the dired command in emacs using C-x d. 
+For example, the directory listing in emacs shows 
+
+dired : 
+  -rwxr-xr-x    1 root root       41496 Jun 30  2016 [
+  -rwxr-xr-x    1 root root      107856 Mar  2  2017 a2p
+  -rwxr-xr-x    1 root root       52640 Oct  3 06:37 ab
+
+ls -l:
+
+ -rwxr-xr-x    1 root root       41496 Jun 30  2016 '['
+-rwxr-xr-x    1 root root      107856 Mar  2  2017  a2p
+-rwxr-xr-x    1 root root       52640 Oct  3 06:37  ab
+
+ls -l displays 301660 results 
+while the dired command displays 301736. 
+Apart from that, there is no difference. 
+
+

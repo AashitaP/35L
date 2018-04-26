@@ -1,0 +1,26 @@
+1. checked the version using sort --version
+
+2. to generate 10,000,000 random single precision floating numbers 
+with one per line I used the command 
+od -An -t f4 -N 40000000 < /dev/urandom | tr -s ' ' '\n' > lab6.txt 
+since each floating point number is 4 bytes. 
+The od command generates numbers and tr is used to replace spaces with newlines
+
+3. Doing wc -l < lab6.txt shows that there are 10,000,001 lines so to delete one line I use the command sed '1d' lab6.txt > lab6lines.txt and confirm that there are 10,000,000 lines in lab6lines.txt
+
+4. Next we have to time the sort command with --parallel and -g options. I run the time command 5 times, once without the parallel option specifying different number of threads 1,2,4 and 8. 
+
+The command used is: 
+time -p /usr/local/cs/bin/sort -g --parallel=2 la6lines.txt > /dev/null
+
+
+				no parallelism 	Parallel = 1 	Parallel = 2 	Parallel = 4 	Parallel = 8
+real 			20.89			102.96			56.20		    33.21			22.21
+user 			113.64			102.76			106.72.         111.78			114.00
+sys 			0.44			0.18			0.27.           0.36			0.44
+
+
+Real time decreases with more parallel options and system time increases. Though without the paralell option, real time is the lowest. 
+
+
+

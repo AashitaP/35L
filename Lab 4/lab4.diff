@@ -1,0 +1,17 @@
+2018-02-09 Aashita Patwari <classaas@lnxsrv07.seas.ucla.edu>
+
+	* coreutils-with-bug/lib/timespec.h(timespec_cmp):
+	Used direct comparison to avoid errors due to integer overflow that
+	results in an incorrect output for time stamps very far in the past. 
+--- coreutils-with-bug/lib/timespec.h	2005-09-21 23:05:39.000000000 -0700
++++ coreutils-with-bug/lib/timespec.h	2018-02-09 14:46:11.849080000 -0800
+@@ -45,8 +45,7 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  return a.tv_sec > b.tv_sec ? 1 : (a.tv_sec < b.tv_sec ? -1 : 0);
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

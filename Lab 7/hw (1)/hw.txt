@@ -1,0 +1,11 @@
+1. If other teams had just been observing the bytes going across the network, 
+the network would still be secure as without the private key that is not sent
+ across, they cannot decode the message. But observing the keystrokes would 
+allow them to observe the passphrase and commands that I use and duplicate it 
+to get hold of the private key and hence the network would not be secure. 
+If i'm booting off USB, it will also be insecure as the other team would be able to access where the keys are stored and obtain the private key. 
+
+2. The command has access to the public key and the account name associated but cannot determine that that name created the public key. 
+To fix this, we could send a message to the specified account that is encrypted by the public key. 
+Only if the account had created that key, would it have the corresponding private key and be able to decrypt the message. 
+If some other account created the public key, it would not be able to decrypt the message. 

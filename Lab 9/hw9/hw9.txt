@@ -1,0 +1,63 @@
+1. First I created the branch using git checkout -b quote
+2. Then applied patch,  
+
+patch -p1 < quote-3.0-patch.txt
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+3. I used emacs, and the function add-change-log-entry-other-window (C-x 4 a) repeatedly to add 6 entries as follows:
+
+	* src/util.c: Replace backtick with apostrophe
+
+	* src/sdiff.c: Replace backtick with apostrophe
+
+	* src/dir.c: Replace backtick with apostrophe
+
+	* src/diff3.c: Replace backtick with apostrophe
+
+	* src/diff.c: Replace backtick with apostrophe
+
+	* src/cmp.c: Replace backtick with apostrophe
+
+4. To commit my changes, I first add all the files and then commit using ChangeLog entry as commit message.
+
+git add . 
+git commit -F ChangeLog
+
+Doing git log confirms that this went on as expected. 
+
+5. Used git format-patch -1 --stdout > formatted-patch.txt to generate the patch.
+
+6. I exchanged the patch with my partner over email and renamed his patch to formatted-patch1.txt. 
+I checked out v3.0 into a new branch using git checkout v3.0 -b partner
+
+7. git am < formatted-patch1.txt to apply the patch, git log verifies this. 
+
+8. After exporting PATH again, I used ./bootstrap, applied the patch on the website 
+and then ./configure and make to build the system and check using make check. 
+
+It initially gave errors so I follow the instructions given in a piazza post and remove shell_or_perl_ from above build_programs = 
+and execute chmod +x tests/binary tests/no-newline-at-eof. 
+
+After running make check again, there are no errors. Hence my partner's patch works. 
+
+9. Next i ran make distdir which created the directory diffutils-3.0.1-9829-dirty. Examining the changelog files shows my partner's log entry. 
+
+2018-03-15 Parth Ravindra Ingle <ingle@lnxsrv06.seas.ucla.edu>
+		* Applied quote patch on the diffutils website that replaces ` with '
+		* Reverted that patch in all non-source code files
+		* Reverted that patch in all source code files where they made changes to comments
+
+10. I SSHed ino the server with X11 enabled, updated my path using $ export PATH=/usr/local/cs/bin:$PATH and ran gitk in the ~eggert/src/gnu/emacs directory.
+I found the newest merge that ix not newer than 2015-01-25 and took a screenshot. 
+
+
+
+
+
+
+

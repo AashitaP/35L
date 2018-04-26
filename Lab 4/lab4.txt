@@ -1,0 +1,146 @@
+1. wget http://web.cs.ucla.edu/classes/winter17/cs35L/assign/coreutils-with-bug.tar.gz to get the file. 
+
+2. tar -xzvf coreutils-with-bug.tar.gz to untar the file. 
+
+3. mkdir coreutilsInstall to create a new directory, pwd to get address to append to prefix
+
+4. cd coreutils-with-bug to go into the directory, ./configure --prefix=/u/eng/class/classaas/coreutilsInstall to configure the file 
+
+5. make command produces errors
+
+error: conflicting types for 'futimens'
+ int futimens (int, char const *, struct timespec const [2]);
+     ^~~~~~~~
+In file included from utimecmp.h:25:0,
+                 from utimecmp.c:25:
+/usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens' was here
+ extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+            ^~~~~~~~
+
+make[3]: *** [Makefile:659: utimecmp.o] Error 1
+make[3]: Leaving directory '/w/home.18/class/classaas/coreutils-with-bug/lib'
+make[2]: *** [Makefile:414: all] Error 2
+make[2]: Leaving directory '/w/home.18/class/classaas/coreutils-with-bug/lib'
+make[1]: *** [Makefile:419: all-recursive] Error 1
+make[1]: Leaving directory '/w/home.18/class/classaas/coreutils-with-bug'
+make: *** [Makefile:357: all] Error 2
+
+6. wget http://web.cs.ucla.edu/classes/winter17/cs35L/assign/coreutils.diff to create patch file. I then manually removed all the tildas from file names
+
+7. patch -p0 < coreutils.diff to patch the old version. 
+Building runs smoothly with make and make install commands that do not produce any errors when building. 
+This is because renaming the files solves the error of conflicting types for the same name
+
+8. To reproduce error: 
+
+$ tmp=$(mktemp -d)
+$ cd $tmp
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 /u/eng/class/classaas/coreutils-with-bug/src/ls -lt --full-time wwi-armistice now now1
+
+-rw-r--r-- 1 classaas class 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 classaas class 0 2018-02-08 18:42:12.673104768 +0000 now1
+-rw-r--r-- 1 classaas class 0 2018-02-08 18:42:05.401906878 +0000 now
+
+
+8. While we are in the temp directory, I run gdb /u/eng/class/classaas/coreutils-with-bug/src/ls
+
+9. info functions shows all the functions within the src directory 
+to see the list of functions under ls.c that may potentially have the error. 
+I start off by looking at the function static int compare_mtime(V, V);
+
+10. I set a breakpoint using break compare_mtime, and then run gdb using r -lt --full-time wwi-armistice now now1. 
+By using si commands, I come across the line :  
+
+(gdb) si
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:49
+49	  return diff ? diff : a.tv_nsec - b.tv_nsec;
+
+This looks like it could result in integer overflow as the difference is stored in int diff. 
+To confirm this I use the command info locals. 
+In the first iteration, it gives a value of 7 
+which corresponds to the difference between now1 and now 
+but the second iteration gives a very large negative number 
+diff = -1162928125 which confirms that there has been integer overflow that resulted in the error. 
+
+
+11. to fix error, I exit the gdb and go into the coreutils-with-bug folder 
+and the corresponding source file which is /lib/timespec.h. 
+First I copy the file using cp timespec.h ../../timespec.h 
+so that it is created in the parent directory and do cd ~ to go back to it. 
+
+I use vi timespec.h to go into the file and modify it. 
+To avoid overflow, we have to avoid subtraction and 
+this can be done by directory comparing the two timespecs and 
+returning positive/0/negative numbers respectively. 
+
+Hence, I modify line 48 and 49 and replace them with: 
+
+return a.tv_sec > b.tv_sec ? 1 : (a.tv_sec < b.tv_sec ? -1 : 0);
+
+12. To produce patch file: 
+
+First I create a changelog file using vi changelog and inputting 
+
+2018-02-09 Aashita Patwari <classaas@lnxsrv07.seas.ucla.edu>
+
+        * coreutils-with-bug/lib/timespec.h(timespec_cmp):
+        Used direct comparison to avoid errors due to integer overflow that 
+        results in an incorrect output for time stamps very far in the past.
+
+Then I created a diff file within the coreutils-with-bug directory using diff -u coreutils-with-bug/lib/timespec.h timespec.h > patch.diff. 
+
+I combined both change log and diff files using: 
+
+cp changelog lab4.diff
+cat patch.diff >> lab4.diff
+
+This creates a new patch file lab4.diff containing my coreutils fixes, 
+in the form of a ChangeLog entry followed by a diff -u patch. 
+
+Before I can apply the patch, I have to modify the path since the file is in the home directory. 
+I replace timespec.h with coreutils-with-bug/lib/timespec.h. 
+
+13. Applying patch: 
+
+patch -p0 < lab4.diff
+
+14. Testing patch: 
+
+$ tmp=$(mktemp -d)
+$ cd $tmp
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+
+This produces 
+
+-rw-r--r-- 1 classaas class 0 2018-02-11 00:49:01.363877292 +0000 now1
+-rw-r--r-- 1 classaas class 0 2018-02-11 00:48:56.840753932 +0000 now
+-rw-r--r-- 1 classaas class 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+
+which is the correct output. 
+
+15. Reproduce problem in home directory: 
+
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+
+
+-rw-r--r-- 1 classaas class 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 classaas class 0 2018-02-10 06:39:38.353407000 +0000 now1
+-rw-r--r-- 1 classaas class 0 2018-02-10 06:39:26.762648000 +0000 now
+
+A very old file appears as one in the future. 
+This is due to difference in the bit level representation of the time in seconds 
+between the home directory and the tmp directory. 
+
+

@@ -1,0 +1,5 @@
+The top left window shows a graphical display of the branches and when it was created or merged. 
+The top right two windows shows who made the commit and when. 
+The bottom left windows shows detail about the commit including the branches, parent, child, author, committer, 
+and the specific changes made to each file in diff format. 
+The bottom right window shows the files affected by the commit. 

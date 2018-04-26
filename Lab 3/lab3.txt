@@ -1,0 +1,41 @@
+1. First I made another directory called coreutilsInstall, 
+this will be used later to make sure the coreutils package 
+is only installed in that directory and not the local server. 
+
+2. Next I grab Coreutils 7.6 using 
+wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz. 
+This creates another folder called coreutils-7.6.tar.gz 
+that I untarred using tar -xzvf coreutils-7.6.tar.gz. 
+This created another temporary directory. 
+
+3. I go into the directory using cd coreutils-7.6 and 
+configure using ./configure --prefix=/u/eng/class/classaas/coreutilsInstall. 
+This configures the package in the coreutilsInstall directory created earlier. 
+
+4. Following that I use make and make install to finish installing the package.
+
+5. Doing ./src/ls -l shows the wrong date format 
+which is for example 
+-rw-r--r--  1 classaas class    3571 2009-09-01 04:01 AUTHORS. 
+
+6. I created a patch file in coreutils-7.6 
+using vim patch_file and copied Brady's patch into the file.
+
+7. I applied the patch using patch -p1 < patch_file
+
+8. I used the make command again.
+Doing ./src/ls -l in the directory (coreutils-7.6)
+shows the correct date format.  
+If we go in the src directory and do ls -l we can see that the ls file 
+has been modified and shows the last modification time as recently. 
+
+9. ./src/ls -l gives the correct format (different format for old and new), 
+touch new and ls -l gives 
+-rw-r--r-- 1 classaas class    0 Jan 30 11:20 new 
+touch old -d 1/30/1989 
+and ls -l gives 
+-rw-r--r-- 1 classaas class    0 Jan 30  1989 old
+Newer files include the time and not the year, 
+which is taken to be the current year. 
+Older files include the year. 
+

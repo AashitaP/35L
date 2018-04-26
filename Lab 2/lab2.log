@@ -1,0 +1,108 @@
+export LC_ALL='C' : 
+to make sure locale outputs the right thing
+
+sort /usr/share/dict/words > words: 
+to sort the words file
+
+wget -O assign2.txt 
+http://web.cs.ucla.edu/classes/winter17/cs35L/assign/assign2.html: 
+to take a text file containing the html in the assignment's web page
+
+
+GIVEN COMMANDS: 
+
+tr -c 'A-Za-z' '[\n*]' < assign2.txt : tr to translate, 
+man tr to see what c option does, 
+it uses complement of the first set which is A-Za-z, 
+which means all non letters are translated into newline characters
+
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt: 
+man tr to see what cs option does, 
+s replaces each sequence of a repeated character 
+that is listed in the last specified SET, 
+with a single occurrence of that character, 
+which means that multiple repeated non letters 
+are not replaces with multiple new lines, just one. 
+
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort : 
+sorts the previous output in alphabetical order 
+such that there is only one word in each line. 
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u: 
+removes repeated words in the sorted version
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u | comm - words : 
+man comm, comm compares 2 sorted files line by line, 
+the first column shows the words unique to the HTML page, 
+the second column shows the words unique to the words file 
+and the last column shows the lines that appear in both files. 
+
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u | comm -23 - words : 
+man comm, 
+adding -23 suppresses column 2 and column 3 
+and hence only shows the words unique to the HTML page. 
+
+
+wget -O hawa.txt http://mauimapp.com/moolelo/hwnwdseng.htm 
+to extract hawaiian words
+
+BUILDWORDS: 
+
+follow each command with a pipe '|'
+
+1) sed '/<!DOCTYPE/,/Adopt<\/td>/d': 
+to remove the first few lines until the first hawaiian word
+2) sed '/<tr>/,/<\/td>/d' : 
+to remove all the english words
+3) tr '[:upper:]' '[:lower:]' : translate all upper case to lower case
+4) sed 's/<u>//g' : 
+to remove <u> 
+5) sed 's/<\/u>//g' : to remove </u> 
+6) sed s/\`/\'/g : to replace ` with ' 
+7) sed 's/, /\n/g' : treat words separated by commas or spaces 
+as two different words by replacing with newline character
+8) sed 's/ /\n/g' : treat words separated by commas or spaces 
+as two different words by replacing with newline character
+9) sed 's/<[^>]*>//g' : 
+to remove all html tags
+10) sed '/www\./,/letter\./d' : to remove the last few lines
+11) sed 's/^\s*//g' : to remove leading space
+12) sed '/^$/d' : to remove empty lines
+13) grep -v "[^pk'mnwlhaeiou]"  : 
+removes all lines with non hawaiian letters
+14) sort -u
+
+
+ls -l : to see the buildwords is not executable so we use chmod +x buildwords
+
+To make the hawaiian words dictionary using the executable 
+I used cat hawa.txt | ./buildwords > hwords 
+such that hwords contains the dictionary. 
+
+
+SPELL CHECKERS:
+
+The web page is already retrieved as assign2.txt. 
+
+To run the spell checker on this webpage,
+I use the command tr -cs "/'pkmnwlhaeiou" '[\n*]' < assign2.txt | 
+tr '[:upper:]' '[:lower:]' | sort -u | comm -23 - hwords. 
+I redirected the output into file misshawa.txt 
+and used wc -l to count the number of misspelled hawaiian words. 
+
+For english words I used a similar approach. 
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt 
+| sort -u | comm -23 - words > misseng.txt 
+followed by wc -l misseng.txt
+
+Number of misspelled hawaiian words is 200. 
+Number of misspelled english words is 81. 
+
+There are words misspelled in english 
+but not in hawaiian such as wiki, halau 
+and words misspelled in hawaiian but not english such as eep and ample.  
+
+

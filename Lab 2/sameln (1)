@@ -1,0 +1,32 @@
+#!/bin/bash
+export LC_ALL='C'
+
+IFS=$'\n' 
+#so that the delimitter is a 
+#newline not a space or any other special characters 
+files="$(find $1 -maxdepth 1 -type f | sort)" 
+#sort all the regular files into files
+for file1 in $files
+do
+  for file2 in $files
+  do
+  	if [ $file1 != $file2 ] #if files don't have the same name
+  	then 
+  		if [ ! -r "$file1" ] #throw an error if file1 is not readable
+  		then 
+  			echo "$file1 is not readable"
+  			continue
+  		fi
+  		if [ ! -r "$file2" ] #throw an error if file2 is not readable
+  		then 
+  			echo "$file2 is not readable"
+  			continue
+  		fi
+    	cmp -s "$file1" "$file2"
+    	if [ $? -eq 0 ]
+    	then 
+    		ln -f "$file1" "$file2"  #if files are equal hard link
+    	fi
+    fi
+  done
+done

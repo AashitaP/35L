@@ -1,0 +1,28 @@
+1. The original code without the changes would 
+goto case_long_iso_time_style if the locale_format 
+was same as the long_time_format. 
+However since this condition will never be fulfilled 
+and this part of the code is removed in the patch, 
+the case would never be called and 
+hence it was not necessary to remove it. 
+
+2. If there are people who don't speak english, 
+they may not be able to read the date 
+as it is written out in english. 
+Furthermore, if this patch is applied in countries that use dd-mm format 
+instead of mm-dd, the patch may produce an incorrect date. 
+
+3. Invoking randline.py on /dev/null 
+returns IndexError: list index out of range. 
+When return random.choice(self.lines) is called, in choice, 
+return seq[int(self.random() * len(seq))] 
+raises this error if the sequence is empty. 
+Since this script is invoked on an empty file like /dev/null, 
+the sequence is empty and hence returns an erorr. 
+
+4. Using python3 results in a syntax error 
+at "except IOError as (errno, strerror):" 
+The correct form for python 3 would be "except IOError as err:".  
+Exceptions in Python 2 are iterable, 
+but this breaks the explicit is better than implicit rule of Python 
+and has as such been removed in Python 3. 

@@ -1,0 +1,77 @@
+1) Measure any differences in performance between sfrob and sfrobu using the time command. Run your program on inputs of varying numbers of input lines. 
+
+I created two files - file1 with 7 lines and file2 with 406 lines. 
+
+time ./sfrob < file1.txt
+
+real	0m0.002s
+user	0m0.001s
+sys	0m0.000s
+
+time ./sfrob < file2.txt
+
+real	0m0.003s
+user	0m0.000s
+sys	0m0.003s
+
+time ./sfrobu < file1.txt
+
+real	0m0.002s
+user	0m0.001s
+sys	0m0.001s
+
+time ./sfrobu < file2.txt
+
+real	0m0.010s
+user	0m0.001s
+sys	0m0.008s
+
+
+sfrobu takes longer.
+
+
+2) estimate the number of comparisons as a function of the number of input lines.
+
+I used strace for this. 
+
+for file1 sfrob has 42 lines of output and sfrobu 124. 
+for file2 sfrob has 447, sfrobu 9695. 
+
+Using the larger file as a better estimate, sfrob makes about one comparison per input line
+and sfrobu makes about 20. 
+
+3) Use the time command to compare the overall performance of sfrob, sfrobu, sfrobs, sfrobu -f, and sfrobs -f.
+
+time ./sfrob < file2.txt
+
+real	0m0.004s
+user	0m0.003s
+sys	0m0.000s
+
+time ./sfrobu < file2.txt
+
+real	0m0.010s
+user	0m0.002s
+sys	0m0.007s
+
+time ./sfrobs < file2.txt
+
+real	0m0.009s
+user	0m0.003s
+sys	0m0.007s
+
+time ./sfrobu -f < file2.txt
+
+real	0m0.010s
+user	0m0.002s
+sys	0m0.007s
+
+time ./sfrobs -f < file2.txt
+
+real	0m0.006s
+user	0m0.002s
+sys	0m0.007s
+
+sfrob is the fastest. sfrobs and sfrobu have similar performance. 
+Adding the flag does not change sfrobu but makes sfrobs faster. 
+
